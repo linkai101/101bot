@@ -3,7 +3,7 @@
     "bot_info": {
         "name": "101bot",
         "version": "0.9",
-        "status": "101bot | -help",
+        "status": "101bot | =help",
         "statusType": "PLAYING"
     },
     "embedSettings": {
