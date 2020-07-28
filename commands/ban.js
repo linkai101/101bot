@@ -25,7 +25,7 @@ module.exports = {
             return;
         }
 
-        const banReason = message.content.substr(prefix.length+4+args[0].length+1,message.content.length-1);
+        const banReason = message.content.substr(message.content.split(" ")[0].length+1,message.content.length-1);
 
         if (!message.guild.member(message.mentions.members.first())) {client.commands.get('error').execute(message, args, "User not in guild"); return;}
 

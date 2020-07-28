@@ -65,15 +65,15 @@ module.exports = {
         if (!voiceChannel) {message.channel.send(notInVCMessage);return;}
 
         voiceChannel.join().then(connection => {
-            console.log('VOICE> Connected to voice channel ('+voiceChannel.id+')')
+            //console.log('VOICE> Connected to voice channel ('+voiceChannel.id+')')
             const dispatcher = connection.play(require('path').resolve(__dirname, '../soundboard/'+args[0]+'.mp3'))
             dispatcher.on('start', () => {
-                console.log('VOICE> Started playing '+args[0]+'.mp3');
+                //console.log('VOICE> Started playing '+args[0]+'.mp3');
             });
             dispatcher.on('finish', () => {
-                console.log('VOICE> Finished playing '+args[0]+'.mp3');
+                //console.log('VOICE> Finished playing '+args[0]+'.mp3');
                 voiceChannel.leave();
-                console.log('VOICE> Disconnected from voice channel ('+voiceChannel.id+')')
+                //console.log('VOICE> Disconnected from voice channel ('+voiceChannel.id+')')
             });
         }).catch(catchErr);
 

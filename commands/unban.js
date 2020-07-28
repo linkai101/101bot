@@ -25,7 +25,7 @@ module.exports = {
             return;
         }
 
-        const unbanReason = message.content.substr(prefix.length+6+args[0].length+1,message.content.length-1); // Unban reason
+        const unbanReason = message.content.substr(message.content.split(" ")[0].length+1,message.content.length-1); // Unban reason
         const memberID = args[0].split("<@").join("").split("!").join("").split(">").join(""); // Member ID that was inputted
 
         const banList = await message.guild.fetchBans().catch(catchErr); // Banlist
