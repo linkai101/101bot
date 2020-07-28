@@ -1,15 +1,15 @@
 {
-    "prefix": "-",
+    "prefix": "=",
     "bot_info": {
         "name": "101bot",
         "version": "0.9",
-        "status": "101bot-DEV | -help",
+        "status": "101bot | -help",
         "statusType": "PLAYING"
     },
     "embedSettings": {
         "color": "#0099ff",
         "image_url": "https://cdn.discordapp.com/avatars/736717344025608272/b72cb7f794d801cecb02f7c23ab3f975.png?size=256",
-        "footer": "101bot-DEV",
+        "footer": "101bot v0.9beta",
         "footer_url": ""
     },
     "rickRollMessages": [

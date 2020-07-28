@@ -39,8 +39,8 @@ module.exports = {
 
         message.channel.bulkDelete(args[0]).then(() => {
             message.channel.send(clearSuccessMessage)
-                .then(sentMessage => {sentMessage.delete({timeout: 10000});}).catch(catchErr);
-        });
+                .then(sentMessage => {sentMessage.delete({timeout: 10000}).catch(err => {});}).catch(catchErr);
+        }).catch(catchErr);
 
     }
 }

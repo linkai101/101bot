@@ -1,10 +1,17 @@
 const Discord = require("discord.js");
+const fs = require('fs');
+
+const sounds = fs.readdirSync(require('path').resolve(__dirname, '../soundboard')).filter(file => file.endsWith('.mp3'));
+var i;
+for (i=0;i<sounds.length;i++) {
+    sounds[i] = sounds[i].replace('.mp3','')
+}
 
 module.exports = {
     name: 'soundboard',
     aliases: ["soundboard", "sb"],
     description: "Plays a sound effect in the VC that you're connected to",
-    execute(client, message, args, sounds) {
+    execute(client, message, args) {
         const {prefix, embedSettings} = require('../config.json');
 
         const catchErr = err => {
@@ -44,7 +51,7 @@ module.exports = {
         const notInVCMessage = new Discord.MessageEmbed()
             .setColor(embedSettings.color)
             .setAuthor("You are not in a voice channel", 'https://images.emojiterra.com/google/android-nougat/512px/26a0.png', '')
-            .setDescription("You have to be in a voice channel to do this!")
+            .setDescription("You have to be in a voice channel to do that!")
 
             //.setTimestamp()
             .setFooter(embedSettings.footer, embedSettings.footer_url);
