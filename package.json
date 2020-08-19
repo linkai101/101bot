@@ -1,17 +1,22 @@
 {
   "name": "101bot",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "",
-  "main": "index.js",
+  "main": "bot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "linkai101",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/opus": "^0.3.2",
+    "cheerio": "^1.0.0-rc.3",
     "discord.js": "^12.2.0",
-    "node-opus": "^0.3.3"
+    "discord.js-commando": "github:discordjs/Commando",
+    "ffmpeg-static": "^4.2.6",
+    "git": "^0.1.5",
+    "mysql": "^2.18.1",
+    "node-opus": "^0.3.3",
+    "simple-youtube-api": "^5.2.1",
+    "ytdl-core": "^3.2.0"
   }
 }
