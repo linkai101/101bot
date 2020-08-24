@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const commando = require('discord.js-commando');
-const mysql = require('mysql');
+const pool = require('./lib/dbpool');
 
 const path = require('path');
 const config = require(path.join(__dirname, 'config', 'config.json'));
@@ -28,48 +28,26 @@ const client = new commando.CommandoClient({
     commandEditableDuration: 30, // Time in seconds that command messages should be editable
 });
 
-// MySQL
-var connection = mysql.createConnection({
-    host: config.mySQL.host,
-    port: config.mySQL.port,
-    database: config.mySQL.database,
-    user: config.mySQL.user,
-    password: config.mySQL.password
+
+// MYSQL
+var addTablePrefixes = "CREATE TABLE prefixes (id INT AUTO_INCREMENT PRIMARY KEY, guildID VARCHAR(255), prefix VARCHAR(255))";
+pool.query(addTablePrefixes, function (err, result) {
+    //if (err) console.log("MYSQL> 'prefixes' table already exists or something went wrong");
+    if (!err) console.log("MYSQL> Created table 'prefixes'");
 });
 
-function connectToMySQL() {
-    connection.connect(function(err) {
-        if (err) throw err;
-        console.log("MYSQL> Connected to mySQL database!");
-    
-        var addTablePrefixes = "CREATE TABLE prefixes (id INT AUTO_INCREMENT PRIMARY KEY, guildID VARCHAR(255), prefix VARCHAR(255))";
-        connection.query(addTablePrefixes, function (err, result) {
-            //if (err) console.log("MYSQL> 'prefixes' table already exists or something went wrong");
-            if (!err) console.log("MYSQL> Created table 'prefixes'");
-        });
-    
-        var addTableExperience = "CREATE TABLE experience (id INT AUTO_INCREMENT PRIMARY KEY, guildID VARCHAR(255), userID VARCHAR(255), xp INT(9), messages INT(9), lastMsgTimestamp BIGINT(15))";
-        connection.query(addTableExperience, function (err, result) {
-            //if (err) console.log("MYSQL> 'experience' table already exists or something went wrong");
-            if (!err) console.log("MYSQL> Created table 'experience'");
-        });
-    
-        var addEconomyExperience = "CREATE TABLE economy (id INT AUTO_INCREMENT PRIMARY KEY, guildID VARCHAR(255), userID VARCHAR(255), balance INT(9), lastDailyTimestamp BIGINT(15), lastDailyXP INT(9))";
-        connection.query(addEconomyExperience, function (err, result) {
-            //if (err) console.log("MYSQL> 'economy' table already exists or something went wrong");
-            if (!err) console.log("MYSQL> Created table 'economy'");
-        });
-    });
-    connection.on('error', function(err) {
-        console.log('MYSQL> ERROR! ', err);
-        if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
-            connectToMySQL();                         // lost due to either server restart, or a
-        } else {                                      // connnection idle timeout (the wait_timeout
-            throw err;                                  // server variable configures this)
-        }
-    });
-}
-connectToMySQL();
+var addTableExperience = "CREATE TABLE experience (id INT AUTO_INCREMENT PRIMARY KEY, guildID VARCHAR(255), userID VARCHAR(255), xp INT(9), messages INT(9), lastMsgTimestamp BIGINT(15))";
+pool.query(addTableExperience, function (err, result) {
+    //if (err) console.log("MYSQL> 'experience' table already exists or something went wrong");
+    if (!err) console.log("MYSQL> Created table 'experience'");
+});
+
+var addEconomyExperience = "CREATE TABLE economy (id INT AUTO_INCREMENT PRIMARY KEY, guildID VARCHAR(255), userID VARCHAR(255), balance INT(9), lastDailyTimestamp BIGINT(15), lastDailyXP INT(9))";
+pool.query(addEconomyExperience, function (err, result) {
+    //if (err) console.log("MYSQL> 'economy' table already exists or something went wrong");
+    if (!err) console.log("MYSQL> Created table 'economy'");
+});
+
 
 client.registry
     .registerDefaults()
@@ -105,13 +83,13 @@ client.on('ready', () => {
     }, 10000); // Runs this every 10 seconds.
 
     // Assigning all stored prefixes on mySQL
-    connection.query("SELECT * FROM prefixes", function (err, resultAll, fields) {
+    pool.query("SELECT * FROM prefixes", function (err, resultAll, fields) {
         if (err) throw err;
         //console.log(result);
     
         var i;
         for (i=0;i<Object.keys(resultAll).length;i++) {
-            connection.query(`SELECT * FROM prefixes WHERE guildID = '${resultAll[i].guildID}'`, function (err, resultRecord) {
+            pool.query(`SELECT * FROM prefixes WHERE guildID = '${resultAll[i].guildID}'`, function (err, resultRecord) {
                 if (err) throw err;
                 i--;
                 client.guilds.cache.get(resultAll[i].guildID).commandPrefix = resultRecord[0].prefix;
@@ -121,7 +99,7 @@ client.on('ready', () => {
 })
 
 function updateXP(message) {
-    connection.query(`SELECT * FROM experience WHERE userID = '${message.author.id}' AND guildID = '${message.guild.id}'`, function (err, result) {
+    pool.query(`SELECT * FROM experience WHERE userID = '${message.author.id}' AND guildID = '${message.guild.id}'`, function (err, result) {
         if (err) throw err;
         //console.log(result);
 
@@ -129,7 +107,7 @@ function updateXP(message) {
 
         if (!xpRecord) {
             var addXPRecord = `INSERT INTO experience (guildID, userID, xp, messages, lastMsgTimestamp) VALUES ('${message.guild.id}', '${message.author.id}', 0, 0, ${message.createdTimestamp})`;
-            connection.query(addXPRecord, function (err) {
+            pool.query(addXPRecord, function (err) {
                 if (err) throw err;
                 //console.log("1 record inserted");
             });
@@ -160,14 +138,14 @@ function updateXP(message) {
         }
 
         var updateXP = `UPDATE experience SET xp = ${xpRecord.xp+newXP} WHERE id = ${xpRecord.id}`;
-        connection.query(updateXP, function (err, result) {if (err) throw err;});
+        pool.query(updateXP, function (err, result) {if (err) throw err;});
 
         var updateMessages = `UPDATE experience SET messages = ${xpRecord.messages+1} WHERE id = ${xpRecord.id}`;
-        connection.query(updateMessages, function (err, result) {if (err) throw err;});
+        pool.query(updateMessages, function (err, result) {if (err) throw err;});
         
         if (message.createdTimestamp - xpRecord.lastMsgTimestamp >= xpCooldown && !badLength) {
             var updateLastMsgTimestamp = `UPDATE experience SET lastMsgTimestamp = ${message.createdTimestamp} WHERE id = ${xpRecord.id}`;
-            connection.query(updateLastMsgTimestamp, function (err, result) {if (err) throw err;});
+            pool.query(updateLastMsgTimestamp, function (err, result) {if (err) throw err;});
         }
     });
 }
