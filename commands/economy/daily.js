@@ -45,76 +45,92 @@ module.exports = class DailyCommand extends Commando.Command {
                 }
             }
 
-            if (message.createdTimestamp - ecoRecord.lastDailyTimestamp < dailyCooldown) {
-                const dailyCooldownMessage = new Discord.MessageEmbed()
-                        .setColor(embedSettings.color)
-                        .setAuthor('Daily cooldown', `https://images.emojiterra.com/google/android-pie/512px/1f6d1.png`, '')
-                        .setDescription(`You cannot collect your daily reward yet!\nCooldown: ${module.exports.msToTime(dailyCooldown - (message.createdTimestamp-ecoRecord.lastDailyTimestamp))}`)
-                        .setFooter(embedSettings.footer, embedSettings.footer_url);
-                return message.channel.send(dailyCooldownMessage);
-            }
-
-            pool.query(`SELECT * FROM experience WHERE userID = '${message.author.id}' AND guildID = '${message.guild.id}'`, function (err, xpResult) {
+            pool.query(`SELECT * FROM timezone WHERE guildID = '${message.guild.id}'`, function (err, timezoneResult) {
                 if (err) throw err;
 
-                // Leveling rewards
-                var levelingRewards = []
-                var levelBefore = module.exports.calculateLevel(ecoRecord.lastDailyXP).level;
-                var levelAfter = module.exports.calculateLevel(xpResult[0].xp).level
-                var i;
-                if (levelAfter > levelBefore) {
-                    for (i=levelBefore+1;i<=levelAfter;i++) {
-                        levelingRewards.push({level:i, reward: module.exports.calculateLevelRewards(i)});
+                let UTCOffset = 0
+                if (timezoneResult.length != 0) UTCOffset = timezoneResult[0].utcOffset;
+                
+                if (
+                    module.exports.timezoneTime(ecoRecord.lastDailyTimestamp, UTCOffset).getFullYear() == module.exports.timezoneTime(message.createdTimestamp, UTCOffset).getFullYear() &&
+                    module.exports.timezoneTime(ecoRecord.lastDailyTimestamp, UTCOffset).getMonth() == module.exports.timezoneTime(message.createdTimestamp, UTCOffset).getMonth() &&
+                    module.exports.timezoneTime(ecoRecord.lastDailyTimestamp, UTCOffset).getDate() == module.exports.timezoneTime(message.createdTimestamp, UTCOffset).getDate()
+                ) {
+                    const utcString = `${module.exports.timezoneTime(message.createdTimestamp+86400000,UTCOffset).toISOString().replace(/\T.+/, '')} UTC${UTCOffset<0 ? '-' : '+'}${Math.floor(Math.abs(UTCOffset))}:${Math.abs(UTCOffset)*60%60 < 10 ? '0' + Math.abs(UTCOffset)*60%60 : Math.abs(UTCOffset)*60%60}`
+                    const dailyCooldownMessage = new Discord.MessageEmbed()
+                            .setColor(embedSettings.color)
+                            .setAuthor('Daily cooldown', `https://images.emojiterra.com/google/android-pie/512px/1f6d1.png`, '')
+                            .setDescription(`You cannot collect your daily reward yet!\nCome back on **${utcString}**!`)
+                            .setFooter(embedSettings.footer, embedSettings.footer_url);
+                    return message.channel.send(dailyCooldownMessage);
+                }
+
+                pool.query(`SELECT * FROM experience WHERE userID = '${message.author.id}' AND guildID = '${message.guild.id}'`, function (err, xpResult) {
+                    if (err) throw err;
+
+                    // Leveling rewards
+                    var levelingRewards = []
+                    var levelBefore = module.exports.calculateLevel(ecoRecord.lastDailyXP).level;
+                    var levelAfter = module.exports.calculateLevel(xpResult[0].xp).level
+                    var i;
+                    if (levelAfter > levelBefore) {
+                        for (i=levelBefore+1;i<=levelAfter;i++) {
+                            levelingRewards.push({level:i, reward: module.exports.calculateLevelRewards(i)});
+                        }
                     }
-                }
 
-                // Streak reward
-                var streak = false;
-                if (message.createdTimestamp - ecoRecord.lastDailyTimestamp < 172800000 && ecoRecord.lastDailyTimestamp != message.createdTimestamp - dailyCooldown) {
-                    streak = true;
-                }
+                    // Streak reward
+                    var streak = false;
+                    if (message.createdTimestamp - ecoRecord.lastDailyTimestamp < 172800000 && ecoRecord.lastDailyTimestamp != message.createdTimestamp - dailyCooldown) {
+                        streak = true;
+                    }
 
-                // Calculating rewards
-                var newBal = ecoRecord.balance + dailyReward;
-                for (let i = 0; i < levelingRewards.length; i++) {
-                    newBal += levelingRewards[i].reward;
-                }
-                if (streak) {
-                    newBal += streakReward;
-                }
+                    // Calculating rewards
+                    var newBal = ecoRecord.balance + dailyReward;
+                    for (let i = 0; i < levelingRewards.length; i++) {
+                        newBal += levelingRewards[i].reward;
+                    }
+                    if (streak) {
+                        newBal += streakReward;
+                    }
 
-                var updateBal = `UPDATE economy SET balance = ${newBal} WHERE guildID = ${ecoRecord.guildID} AND userID = ${ecoRecord.userID}`; //WHERE id = ${ecoRecord.id}
-                pool.query(updateBal, function (err) {if (err) throw err;});
-                
-                // Rewards message
-                var rewardsMessageDescription = '';
-                rewardsMessageDescription = rewardsMessageDescription.concat(`+$${dailyReward} (Daily reward)\n`);
-                for (let i = 0; i < levelingRewards.length; i++) {
-                    rewardsMessageDescription = rewardsMessageDescription.concat(`+$${levelingRewards[i].reward} (LEVEL ${levelingRewards[i].level} ↑)\n`);
-                }
-                if (streak) {
-                    rewardsMessageDescription = rewardsMessageDescription.concat(`+$${streakReward} (Streak)\n`);
-                }
+                    var updateBal = `UPDATE economy SET balance = ${newBal} WHERE guildID = ${ecoRecord.guildID} AND userID = ${ecoRecord.userID}`; //WHERE id = ${ecoRecord.id}
+                    pool.query(updateBal, function (err) {if (err) throw err;});
+                    
+                    // Rewards message
+                    var rewardsMessageDescription = '';
+                    rewardsMessageDescription = rewardsMessageDescription.concat(`+$${dailyReward} (Daily reward)\n`);
+                    for (let i = 0; i < levelingRewards.length; i++) {
+                        rewardsMessageDescription = rewardsMessageDescription.concat(`+$${levelingRewards[i].reward} (LEVEL ${levelingRewards[i].level} ↑)\n`);
+                    }
+                    if (streak) {
+                        rewardsMessageDescription = rewardsMessageDescription.concat(`+$${streakReward} (Streak)\n`);
+                    }
 
-                const rewardsMessage = new Discord.MessageEmbed()
-                    .setColor(embedSettings.color)
-                    .setAuthor('Daily Rewards', `https://images.emojiterra.com/mozilla/512px/1f4b0.png`, '')
-                    .setTitle(message.author.tag)
-                    .setThumbnail(message.author.avatarURL())
-                    .setDescription(rewardsMessageDescription)
-                    .addFields(
-                        { name: `${message.author.username}'s Balance`, value: `$${newBal}`, inline: true },
-                    )
-                    .setFooter(embedSettings.footer, embedSettings.footer_url);
-                message.channel.send(rewardsMessage);
-                
-                if (message.createdTimestamp - ecoRecord.lastDailyTimestamp >= dailyCooldown) {
-                    var updateLastDailyTimestamp = `UPDATE economy SET lastDailyTimestamp = ${message.createdTimestamp} WHERE guildID = ${ecoRecord.guildID} AND userID = ${ecoRecord.userID}`;
-                    pool.query(updateLastDailyTimestamp, function (err) {if (err) throw err;});
+                    const rewardsMessage = new Discord.MessageEmbed()
+                        .setColor(embedSettings.color)
+                        .setAuthor('Daily Rewards', `https://images.emojiterra.com/mozilla/512px/1f4b0.png`, '')
+                        .setTitle(message.author.tag)
+                        .setThumbnail(message.author.avatarURL())
+                        .setDescription(rewardsMessageDescription)
+                        .addFields(
+                            { name: `${message.author.username}'s Balance`, value: `$${newBal}`, inline: true },
+                        )
+                        .setFooter(embedSettings.footer, embedSettings.footer_url);
+                    message.channel.send(rewardsMessage);
+                    
+                    if (!(
+                        module.exports.timezoneTime(ecoRecord.lastDailyTimestamp, UTCOffset).getFullYear() == module.exports.timezoneTime(message.createdTimestamp, UTCOffset).getFullYear() &&
+                        module.exports.timezoneTime(ecoRecord.lastDailyTimestamp, UTCOffset).getMonth() == module.exports.timezoneTime(message.createdTimestamp, UTCOffset).getMonth() &&
+                        module.exports.timezoneTime(ecoRecord.lastDailyTimestamp, UTCOffset).getDate() == module.exports.timezoneTime(message.createdTimestamp, UTCOffset).getDate()
+                    )) {
+                        var updateLastDailyTimestamp = `UPDATE economy SET lastDailyTimestamp = ${message.createdTimestamp} WHERE guildID = ${ecoRecord.guildID} AND userID = ${ecoRecord.userID}`;
+                        pool.query(updateLastDailyTimestamp, function (err) {if (err) throw err;});
 
-                    var updateLastDailyXP = `UPDATE economy SET lastDailyXP = ${xpResult[0].xp} WHERE guildID = ${ecoRecord.guildID} AND userID = ${ecoRecord.userID}`;
-                    pool.query(updateLastDailyXP, function (err) {if (err) throw err;});
-                }
+                        var updateLastDailyXP = `UPDATE economy SET lastDailyXP = ${xpResult[0].xp} WHERE guildID = ${ecoRecord.guildID} AND userID = ${ecoRecord.userID}`;
+                        pool.query(updateLastDailyXP, function (err) {if (err) throw err;});
+                    }
+                });
             });
         });
     }
@@ -167,6 +183,14 @@ module.exports = class DailyCommand extends Commando.Command {
         var reward = 1.25**(8+level);
         reward = Math.ceil(reward / 10) * 10; // rounding
         return reward;
+    }
+
+    static timezoneTime(time, offset) {
+        let utc = time + new Date().getTimezoneOffset();
+
+        let newDate = new Date(utc + 3600000*offset);
+
+        return newDate;
     }
 }
 

@@ -42,11 +42,18 @@ pool.query(addTableExperience, function (err, result) {
     if (!err) console.log("MYSQL> Created table 'experience'");
 });
 
-var addEconomyExperience = "CREATE TABLE economy (id INT AUTO_INCREMENT PRIMARY KEY, guildID VARCHAR(255), userID VARCHAR(255), balance INT(9), lastDailyTimestamp BIGINT(15), lastDailyXP INT(9))";
-pool.query(addEconomyExperience, function (err, result) {
+var addTableEconomy = "CREATE TABLE economy (id INT AUTO_INCREMENT PRIMARY KEY, guildID VARCHAR(255), userID VARCHAR(255), balance INT(9), lastDailyTimestamp BIGINT(15), lastDailyXP INT(9))";
+pool.query(addTableEconomy, function (err, result) {
     //if (err) console.log("MYSQL> 'economy' table already exists or something went wrong");
     if (!err) console.log("MYSQL> Created table 'economy'");
 });
+
+var addTableTimezone = "CREATE TABLE timezone (id INT AUTO_INCREMENT PRIMARY KEY, guildID VARCHAR(255), utcOffset TINYINT(3))";
+pool.query(addTableTimezone, function (err, result) {
+    //if (err) console.log("MYSQL> 'timezone' table already exists or something went wrong");
+    if (!err) console.log("MYSQL> Created table 'timezone'");
+});
+
 
 
 client.registry
