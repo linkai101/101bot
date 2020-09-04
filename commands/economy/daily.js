@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const Commando = require('discord.js-commando');
 const path = require('path');
 const pool = require('../../lib/dbpool');
-const {embedSettings, mySQL} = require(path.join(__dirname, '..', '..', 'config', 'config.json'));
+const {embedSettings} = require(path.join(__dirname, '..', '..', 'config', 'config.json'));
 const {dailyReward, streakReward} = require(path.join(__dirname, '..', '..', 'config', 'economy.json'));
 
 module.exports = class DailyCommand extends Commando.Command {
@@ -81,7 +81,17 @@ module.exports = class DailyCommand extends Commando.Command {
 
                     // Streak reward
                     var streak = false;
-                    if (message.createdTimestamp - ecoRecord.lastDailyTimestamp < 172800000 && ecoRecord.lastDailyTimestamp != message.createdTimestamp - dailyCooldown) {
+                    /*if (message.createdTimestamp - ecoRecord.lastDailyTimestamp < 172800000 && ecoRecord.lastDailyTimestamp != message.createdTimestamp - dailyCooldown) {
+                        streak = true;
+                    }*/
+                    var yesterday = new Date(module.exports.timezoneTime(message.createdTimestamp, UTCOffset));
+                    yesterday.setDate(module.exports.timezoneTime(message.createdTimestamp, UTCOffset).getDate()-1);
+                    if (
+                        module.exports.timezoneTime(ecoRecord.lastDailyTimestamp, UTCOffset).getFullYear() == yesterday.getFullYear() &&
+                        module.exports.timezoneTime(ecoRecord.lastDailyTimestamp, UTCOffset).getMonth() == yesterday.getMonth() &&
+                        module.exports.timezoneTime(ecoRecord.lastDailyTimestamp, UTCOffset).getDate() == yesterday.getDate() &&
+                        ecoRecord.lastDailyTimestamp != message.createdTimestamp - dailyCooldown
+                    ) {
                         streak = true;
                     }
 

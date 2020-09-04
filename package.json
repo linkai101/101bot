@@ -9,10 +9,11 @@
   "author": "linkai101",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/opus": "^0.3.2",
     "cheerio": "^1.0.0-rc.3",
     "discord.js": "^12.2.0",
     "discord.js-commando": "github:discordjs/Commando",
-    "ffmpeg-static": "^4.2.6",
+    "ffmpeg-static": "^4.2.7",
     "git": "^0.1.5",
     "mysql": "^2.18.1",
     "node-opus": "^0.3.3",

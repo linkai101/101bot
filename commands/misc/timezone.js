@@ -11,9 +11,9 @@ module.exports = class TimezoneCommand extends Commando.Command {
 			group: 'misc',
 			memberName: 'timezone',
             aliases: ['tz'],
-			description: 'Shows or sets the guild timezone.',
+			description: 'Shows or sets the guild timezone',
             guildOnly: true,
-			format: '[prefix/"default"/"none"]',
+			format: '[timezone"/"none"]',
 			examples: ['timezone 0', 'timezone -4', 'timezone -11'],
 
 			args: [
@@ -40,7 +40,8 @@ module.exports = class TimezoneCommand extends Commando.Command {
 
                 const timezoneMessage = new Discord.MessageEmbed()
                     .setColor(config.embedSettings.color)
-                    .setAuthor('Timezone', `https://cdn.discordapp.com/icons/${message.guild.id}/${message.guild.icon}.png`, '')
+					.setAuthor('Timezone', `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/51/clock-face-three-oclock_1f552.png`, '')
+					.setThumbnail(`https://cdn.discordapp.com/icons/${message.guild.id}/${message.guild.icon}.png`)
                     .setDescription(`The timezone for **${message.guild.name}** is **UTC${timezone<0 ? '-' : '+'}${Math.floor(Math.abs(timezone))}:${Math.abs(timezone)*60%60 < 10 ? '0' + Math.abs(timezone)*60%60 : Math.abs(timezone)*60%60}**.`)
 
                     .setFooter(config.embedSettings.footer, config.embedSettings.footer_url);
@@ -84,7 +85,8 @@ module.exports = class TimezoneCommand extends Commando.Command {
         }
 		const timezoneChangedMessage = new Discord.MessageEmbed()
 			.setColor(config.embedSettings.color)
-			.setAuthor('Changed timezone', `https://cdn.discordapp.com/icons/${message.guild.id}/${message.guild.icon}.png`, '')
+			.setAuthor('Changed timezone', `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/51/clock-face-three-oclock_1f552.png`, '')
+			.setThumbnail(`https://cdn.discordapp.com/icons/${message.guild.id}/${message.guild.icon}.png`)
 			.setDescription(`The timezone for **${message.guild.name}** has been changed to **UTC${timezone<0 ? '-' : '+'}${Math.floor(Math.abs(timezone))}:${Math.abs(timezone)*60%60 < 10 ? '0' + Math.abs(timezone)*60%60 : Math.abs(timezone)*60%60}**.`)
 
 			.setFooter(config.embedSettings.footer, config.embedSettings.footer_url);

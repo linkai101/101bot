@@ -28,6 +28,9 @@ module.exports = class LyricsCommand extends Commando.Command {
         });
     }
     async run(message, { songName }) {
+        if (songName == '' && !message.guild) {
+            return message.say('You are not in a guild and no song is playing right now, please try again with a song name or play a song first');
+        }
         if (
             songName == '' &&
             message.guild.musicData.isPlaying /*&&

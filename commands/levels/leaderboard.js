@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const Commando = require('discord.js-commando');
 const path = require('path');
 const pool = require('../../lib/dbpool');
-const {embedSettings, mySQL} = require(path.join(__dirname, '..', '..', 'config', 'config.json'));
+const {embedSettings} = require(path.join(__dirname, '..', '..', 'config', 'config.json'));
 
 module.exports = class LeaderboardCommand extends Commando.Command {
     constructor(client) {
