@@ -1,0 +1,172 @@
+{
+    "dailyReward": 50,
+    "streakReward": 25,
+    "slots": {
+        "minimumBet": 10,
+        "maximumBet": 500,
+        "tax": {
+            "rate": 0.25,
+            "maxRate": 0.5
+        },
+        "symbols": [
+            {
+                "symbol": "bell",
+                "reel1": 1, 
+                "reel2": 1, 
+                "reel3": 1
+            },
+            {
+                "symbol": "chocolate_bar",
+                "reel1": 3, 
+                "reel2": 2, 
+                "reel3": 1
+            },
+            {
+                "symbol": "watermelon",
+                "reel1": 3, 
+                "reel2": 3, 
+                "reel3": 3
+            },
+            {
+                "symbol": "grapes",
+                "reel1": 2, 
+                "reel2": 6, 
+                "reel3": 12
+            },
+            {
+                "symbol": "peach",
+                "reel1": 12, 
+                "reel2": 4, 
+                "reel3": 4
+            },
+            {
+                "symbol": "tangerine",
+                "reel1": 10, 
+                "reel2": 10, 
+                "reel3": 8
+            },
+            {
+                "symbol": "cherries",
+                "reel1": 4, 
+                "reel2": 12, 
+                "reel3": 0
+            },
+            {
+                "symbol": "lemon",
+                "reel1": 0, 
+                "reel2": 0, 
+                "reel3": 10
+            }
+        ],
+        "rewards": [
+            {
+                "combination": ["bell", "bell", "bell"],
+                "credit": 7500
+            },
+            {
+                "combination": ["chocolate_bar", "chocolate_bar", "chocolate_bar"],
+                "credit": 2500
+            },
+            {
+                "combination": ["watermelon", "watermelon", "watermelon"],
+                "credit": 2250
+            },
+            {
+                "combination": ["grapes", "grapes", "grapes"],
+                "credit": 2000
+            },
+            {
+                "combination": ["peach", "peach", "peach"],
+                "credit": 500
+            },
+            {
+                "combination": ["tangerine", "tangerine", "tangerine"],
+                "credit": 500
+            },
+            {
+                "combination": ["bell", "bell", "*"],
+                "credit": 1500
+            },
+            {
+                "combination": ["chocolate_bar", "chocolate_bar", "*"],
+                "credit": 500
+            },
+            {
+                "combination": ["watermelon", "watermelon", "*"],
+                "credit": 400
+            },
+            {
+                "combination": ["grapes", "grapes", "*"],
+                "credit": 200
+            },
+            {
+                "combination": ["peach", "peach", "*"],
+                "credit": 115
+            },
+            {
+                "combination": ["tangerine", "tangerine", "*"],
+                "credit": 300
+            },
+            {
+                "combination": ["cherries", "cherries", "*"],
+                "credit": 125
+            },
+            {
+                "combination": ["*", "bell", "bell"],
+                "credit": 1500
+            },
+            {
+                "combination": ["*", "chocolate_bar", "chocolate_bar"],
+                "credit": 750
+            },
+            {
+                "combination": ["*", "watermelon", "watermelon"],
+                "credit": 400
+            },
+            {
+                "combination": ["*", "grapes", "grapes"],
+                "credit": 115
+            },
+            {
+                "combination": ["*", "peach", "peach"],
+                "credit": 135
+            },
+            {
+                "combination": ["*", "tangerine", "tangerine"],
+                "credit": 325
+            },
+            {
+                "combination": ["bell", "*", "*"],
+                "credit": 100
+            },
+            {
+                "combination": ["*", "bell", "*"],
+                "credit": 100
+            },
+            {
+                "combination": ["*", "*", "bell"],
+                "credit": 100
+            },
+            {
+                "combination": ["chocolate_bar", "*", "*"],
+                "credit": 50
+            },
+            {
+                "combination": ["*", "chocolate_bar", "*"],
+                "credit": 60
+            },
+            {
+                "combination": ["*", "*", "chocolate_bar"],
+                "credit": 75
+            },
+            {
+                "combination": ["grapes", "*", "*"],
+                "credit": 75
+            },
+            {
+                "combination": ["cherries", "*", "*"],
+                "credit": 50
+            }
+        ]
+    }
+}
