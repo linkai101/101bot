@@ -42,6 +42,7 @@ module.exports = class LeaderboardCommand extends Commando.Command {
             var i;
             for (i=0;i<orderedLB.length;i++) {
                 var user = message.guild.members.cache.get(result[orderedLB[i].id].userID);
+                if (!user) user = {user:{tag:"undefined"}}
                 leaderboardMessage.addField(`${i+1} - ${user.user.tag}`, `Level ${module.exports.calculateLevel(orderedLB[i].xp).level} | ${orderedLB[i].xp} XP`, true);
             }
             message.channel.send(leaderboardMessage);
